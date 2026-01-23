@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Global Chat</title>
-  <style>
-    body { font-family: sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; }
-    #chat { display:none; width: 400px; }
-    #messages { border:1px solid #ccc; height:300px; width:100%; overflow:auto; margin-bottom:10px; padding:5px; }
-    input, button { padding:5px; margin:2px; }
-  </style>
+<meta charset="UTF-8">
+<title>Global Chat</title>
+<style>
+  body { font-family:sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; }
+  #chat { display:none; width:400px; }
+  #messages { border:1px solid #ccc; height:300px; width:100%; overflow:auto; margin-bottom:10px; padding:5px; }
+  input, button { padding:5px; margin:2px; width: calc(100% - 14px); }
+</style>
 </head>
 <body>
   <div id="login">
@@ -22,6 +22,7 @@
     <button id="sendBtn">Invia</button>
   </div>
 
+  <script type="module" src="firebase.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>
