@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Global Chat Funzionante</title>
+<title>Global Chat Firestore</title>
 <style>
   body { font-family:sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; }
   #chat { display:none; width:400px; }
@@ -25,13 +25,12 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
 // ---- CONFIG FIREBASE ----
 const firebaseConfig = {
   apiKey: "AIzaSyD-yF6Zvohnm2BcesiISP3csoTDXnfE3tY",
   authDomain: "chill-chat-d558b.firebaseapp.com",
-  databaseURL: "https://chill-chat-d558b-default-rtdb.firebaseio.com",
   projectId: "chill-chat-d558b",
   storageBucket: "chill-chat-d558b.appspot.com",
   messagingSenderId: "297427107896",
@@ -39,7 +38,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
 // ---- LOGICA CHAT ----
 let username = '';
@@ -53,11 +52,10 @@ document.getElementById('enterChat').onclick = () => {
   }
 }
 
-document.getElementById('sendBtn').onclick = () => {
+document.getElementById('sendBtn').onclick = async () => {
   const text = document.getElementById('messageInput').value.trim();
   if(text){
-    // Questo crea automaticamente il nodo "messages" se non esiste
-    push(ref(db, 'messages'), {
+    await addDoc(collection(db, "messages"), {
       user: username,
       text: text,
       timestamp: Date.now()
@@ -66,12 +64,15 @@ document.getElementById('sendBtn').onclick = () => {
   }
 }
 
-// Mostra i messaggi in tempo reale
-onValue(ref(db, 'messages'), (snapshot) => {
+// Ricezione messaggi in tempo reale, ordinati per timestamp
+const messagesCol = collection(db, "messages");
+const q = query(messagesCol, orderBy("timestamp"));
+
+onSnapshot(q, (snapshot) => {
   const messagesDiv = document.getElementById('messages');
   messagesDiv.innerHTML = '';
-  snapshot.forEach((child) => {
-    const data = child.val();
+  snapshot.forEach((doc) => {
+    const data = doc.data();
     const time = new Date(data.timestamp).toLocaleTimeString();
     messagesDiv.innerHTML += `[${time}] ${data.user}: ${data.text}<br>`;
   });
@@ -80,4 +81,3 @@ onValue(ref(db, 'messages'), (snapshot) => {
 </script>
 </body>
 </html>
-s
