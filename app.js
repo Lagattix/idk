@@ -37,7 +37,8 @@ onValue(ref(db, 'messages'), (snapshot) => {
   snapshot.forEach((child) => {
     const data = child.val();
     const msgDiv = document.createElement('div');
-    msgDiv.textContent = `${data.user}: ${data.text}`;
+    const time = new Date(data.timestamp).toLocaleTimeString();
+    msgDiv.textContent = `[${time}] ${data.user}: ${data.text}`;
     messagesDiv.appendChild(msgDiv);
   });
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
