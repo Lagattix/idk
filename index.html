@@ -1,28 +1,72 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Global Chat</title>
-<style>
-  body { font-family:sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; }
-  #chat { display:none; width:400px; }
-  #messages { border:1px solid #ccc; height:300px; width:100%; overflow:auto; margin-bottom:10px; padding:5px; }
-  input, button { padding:5px; margin:2px; width: calc(100% - 14px); }
-</style>
 </head>
 <body>
-  <div id="login">
-    <input type="text" id="username" placeholder="Inserisci il tuo nome">
-    <button id="enterChat">Entra</button>
-  </div>
+<input id="username" placeholder="Nome">
+<button id="enter">Entra</button>
 
-  <div id="chat">
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Scrivi un messaggio">
-    <button id="sendBtn">Invia</button>
-  </div>
+<div id="chat" style="display:none;">
+  <div id="messages" style="border:1px solid black;height:300px;overflow:auto;"></div>
+  <input id="msg" placeholder="Messaggio">
+  <button id="send">Invia</button>
+</div>
 
-  <script type="module" src="firebase.js"></script>
-  <script type="module" src="app.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+// Usa qui l’URL che vedi nella console sotto Realtime Database
+const firebaseConfig = {
+  apiKey: "AIzaSyD-yF6Zvohnm2BcesiISP3csoTDXnfE3tY",
+  authDomain: "chill-chat-d558b.firebaseapp.com",
+  databaseURL: "https://chill-chat-d558b-default-rtdb.firebaseio.com",
+  projectId: "chill-chat-d558b",
+  storageBucket: "chill-chat-d558b.appspot.com",
+  messagingSenderId: "297427107896",
+  appId: "1:297427107896:web:8795a135d68002446866cd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let username = '';
+
+document.getElementById('enter').onclick = () => {
+  const name = document.getElementById('username').value.trim();
+  if(name) {
+    username = name;
+    document.getElementById('username').style.display = 'none';
+    document.getElementById('enter').style.display = 'none';
+    document.getElementById('chat').style.display = 'block';
+  }
+}
+
+document.getElementById('send').onclick = () => {
+  const text = document.getElementById('msg').value.trim();
+  if(text){
+    push(ref(db, 'messages'), {
+      user: username,
+      text: text,
+      timestamp: Date.now()
+    });
+    document.getElementById('msg').value = '';
+  }
+}
+
+onValue(ref(db, 'messages'), (snapshot) => {
+  const messagesDiv = document.getElementById('messages');
+  messagesDiv.innerHTML = '';
+  snapshot.forEach((child) => {
+    const data = child.val();
+    const d = new Date(data.timestamp);
+    const time = `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+    messagesDiv.innerHTML += `[${time}] ${data.user}: ${data.text}<br>`;
+  });
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+</script>
 </body>
 </html>
