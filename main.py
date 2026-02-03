@@ -1,4 +1,7 @@
-a = int(input("inserisci un numero:"))
+mass = int(input("insert your body mass:"))
 
-for i in range(a):
-    print("*")
+height = float(input("insert your height:"))
+
+bmi = mass / height ** 2
+
+print("this is your bmi:", bmi)
